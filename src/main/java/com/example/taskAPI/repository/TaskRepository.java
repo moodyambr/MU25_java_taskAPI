@@ -14,6 +14,7 @@ public class TaskRepository {
         tasks.add(new Task(1, "äpple", false));
         tasks.add(new Task(2, "mjölk", true));
         tasks.add(new Task(3, "citron", false));
+        tasks.add(new Task(4, "kalan", false));
     }
 
     public List<Task> findAll() {
