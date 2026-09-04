@@ -11,7 +11,7 @@ public class TaskRepository {
     private List<Task> tasks = new ArrayList<>();
 
     public TaskRepository() {
-        tasks.add(new Task(1, "banan", false));
+        tasks.add(new Task(1, "äpple", false));
         tasks.add(new Task(2, "mjölk", true));
         tasks.add(new Task(3, "citron", false));
     }

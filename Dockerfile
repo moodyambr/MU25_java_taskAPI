@@ -1,11 +1,11 @@
 # Steg 1: Byggstadiet ( kompilerar spring boot API)
 
-FROM maven:3.9-eclipse-temurin-17-alpine as build
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 
 WORKDIR /app
 
-copy pom.xml .
-copy src ./src
+COPY pom.xml .
+COPY src ./src
 
 RUN mvn clean package -DskipTests
 
