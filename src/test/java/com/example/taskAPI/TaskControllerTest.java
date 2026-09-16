@@ -41,7 +41,9 @@ public class TaskControllerTest {
     private JwtService jwtService;
 
     @Test
-    // GET /tasks ska returnera den mockade listan från repository.
+    // Arrange: skapa en task och mocka repository.findAll() att returnera den.
+    // Act: gör GET /tasks.
+    // Assert: status 200 och att det första namnet är "Köp mjölk".
     void shouldReturnAllTasks() throws Exception {
         Task task = new Task(1, "Köp mjölk", false);
 
@@ -53,7 +55,9 @@ public class TaskControllerTest {
     }
 
     @Test
-    // POST /tasks ska spara task och returnera Created.
+    // Arrange: skapa JSON för en ny task.
+    // Act: gör POST /tasks.
+    // Assert: status 201 och att repository.save() anropas en gång.
     void shouldAddNewTaskAndReturnCreated() throws Exception {
         String jsonRequest = "{ \"id\" : 1, \"name\" : \"Städa\", \"done\": false  }";
 
@@ -68,7 +72,9 @@ public class TaskControllerTest {
     }
 
     @Test
-    // DELETE /tasks/{id} ska radera tasken om den finns.
+    // Arrange: mocka repository.findById(1) så att tasken finns.
+    // Act: gör DELETE /tasks/1.
+    // Assert: status 204 och repository.delete(1) anropas.
     void shouldDeleteTaskWhenFound() throws Exception {
         Task task = new Task();
         when(repository.findById(1)).thenReturn(task);
@@ -80,7 +86,9 @@ public class TaskControllerTest {
     }
 
     @Test
-    // DELETE /tasks/{id} ska returnera 404 om tasken saknas.
+    // Arrange: mocka repository.findById(99) till null.
+    // Act: gör DELETE /tasks/99.
+    // Assert: status 404 och repository.delete() ska aldrig anropas.
     void shouldReturnNotFoundWhenDeletingNonExistingTask() throws Exception {
         when(repository.findById(99)).thenReturn(null);
 
@@ -91,7 +99,9 @@ public class TaskControllerTest {
     }
 
     @Test
-    // PATCH /tasks/{id} ska uppdatera namnet i en befintlig task.
+    // Arrange: skapa en befintlig task med gammalt namn och mocka repository.findById(1).
+    // Act: gör PATCH /tasks/1 med nytt namn.
+    // Assert: status 200 och att namnet har uppdaterats.
     void shouldPatchTaskNameSuccessfully() throws Exception {
         Task existingTask = new Task();
         existingTask.setId(1);
@@ -107,5 +117,4 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Nytt namn"));
     }
-
 }

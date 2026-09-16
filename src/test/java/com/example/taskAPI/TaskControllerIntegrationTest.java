@@ -26,7 +26,9 @@ public class TaskControllerIntegrationTest {
     //    // Setup code if needed
 
     @Test
-    // GET /tasks ska returnera status 200 och alla fördefinierade tasks.
+    // Arrange: inga särskilda data behöver sättas upp; appens repository har redan 5 fördefinierade tasks.
+    // Act: gör GET /tasks.
+    // Assert: status 200 och att listan innehåller 5 tasks med första namnet "äpple".
     void getAllTasks_ShouldReturn200() throws Exception {
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
@@ -36,7 +38,9 @@ public class TaskControllerIntegrationTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    // ADMIN får ta bort en task och får 204 No Content.
+    // Arrange: användaren är inloggad som ADMIN.
+    // Act: gör DELETE /tasks/1.
+    // Assert: status 204 No Content.
     void deleteTaskById_ShouldReturn204() throws Exception {
         mockMvc.perform(delete("/tasks/1"))
                 .andExpect(status().isNoContent());
@@ -44,7 +48,9 @@ public class TaskControllerIntegrationTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    // USER får skapa en ny task och får 201 Created med rätt data tillbaka.
+    // Arrange: användaren är inloggad som USER och har en JSON-body med ny task.
+    // Act: gör POST /tasks.
+    // Assert: status 201 Created och att response innehåller rätt id, namn och done-status.
     void addTask_ShouldReturn201() throws Exception {
         String newTaskJson = "{ \"id\": 99, \"name\": \"New Task\", \"done\": false }";
 

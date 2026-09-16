@@ -20,7 +20,9 @@ public class AuthConrollerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    // Giltig login ska returnera 200 OK och en JWT-token.
+    // Arrange: användaren skickar giltiga inloggningsuppgifter.
+    // Act: gör POST /login.
+    // Assert: status 200 OK och att JWT-token finns i responsen.
     void login_shouldReturnToken_forValidCredentials() throws Exception {
         String loginRequest = "{\"username\":\"david\",\"password\":\"123\"}";
 
@@ -32,7 +34,9 @@ public class AuthConrollerIntegrationTest {
     }
 
     @Test
-    // Felaktigt lösenord ska ge 401 Unauthorized.
+    // Arrange: användaren skickar fel lösenord.
+    // Act: gör POST /login.
+    // Assert: status 401 Unauthorized.
     void login_shouldReturnUnauthorized_forInvalidCredentials() throws Exception {
         String loginRequest = "{\"username\":\"david\",\"password\":\"wrong-password\"}";
 
@@ -41,5 +45,4 @@ public class AuthConrollerIntegrationTest {
                         .content(loginRequest))
                 .andExpect(status().isUnauthorized());
     }
-
 }
