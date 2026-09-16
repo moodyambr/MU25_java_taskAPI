@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
+// Hanterar inloggning och genererar JWT-token för användaren.
 public class AuthController {
 
     @Autowired
@@ -21,27 +22,22 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-
     @PostMapping("/login")
+    // Kontrollerar användarnamn/lösenord och returnerar en JWT om det är korrekt.
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-
-
         try {
-            //1 auth
+            // Verifierar användarens uppgifter mot Spring Security.
             authManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
-
-
-            //2. skapa token
+            // Skapar en JWT för den inloggade användaren.
             String token = jwtService.generateToken(req.getUsername());
 
-
-            //3. returnerar vi token
+            // Returnerar token till klienten i JSON-format.
             return ResponseEntity.ok(Map.of("token", token));
-        } catch ( Exception e) {
+        } catch (Exception e) {
+            // Om autentiseringen misslyckas skickas 401 Unauthorized.
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-
     }
 
 }
