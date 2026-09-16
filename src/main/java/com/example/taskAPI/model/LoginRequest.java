@@ -1,12 +1,14 @@
 package com.example.taskAPI.model;
 
+// DTO för inloggningsförfrågan från klienten.
 public class LoginRequest {
+    // Användarnamn som skickas i JSON.
     private String username;
+    // Lösenord som skickas i JSON.
     private String password;
 
-
-    public LoginRequest() {};
-
+    public LoginRequest() {
+    }
 
     public String getUsername() {
         return username;

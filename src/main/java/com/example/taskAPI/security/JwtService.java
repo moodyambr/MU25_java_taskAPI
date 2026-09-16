@@ -10,11 +10,14 @@ import java.util.Date;
 
 
 @Service
+// Skapar och validerar JWT-token för användare.
 public class JwtService {
+    // Hemlig nyckel som används för att signera och validera tokens.
     private final String secret = "super_hemlig_nyckel_som_ska_vara_lang";
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
     public String generateToken(String username) {
+        // Skapar ett token med användarnamnet som ämne och 1 timmes giltighet.
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -24,12 +27,12 @@ public class JwtService {
     }
 
     public String validateTokenAndGetUserName(String token) {
-        return  Jwts.parserBuilder()
+        // Verifierar token och returnerar användarnamnet inuti token.
+        return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-
     }
 }

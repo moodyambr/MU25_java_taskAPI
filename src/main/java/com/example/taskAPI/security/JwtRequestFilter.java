@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+// Läser JWT från Authorization-headern och sätter användaren i Spring Security.
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -28,23 +29,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Hämtar token från headern, om den finns.
+        String authHeader = request.getHeader("Authorization");
 
-            String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            // Tar bort "Bearer " och får bara själva token.
+            String token = authHeader.substring(7);
 
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
+            // Validerar token och hämtar användarnamnet.
+            String userName = jwtService.validateTokenAndGetUserName(token);
 
-                String userName = jwtService.validateTokenAndGetUserName(token);
+            if (userName != null) {
+                // Laddar användaren från användardatat och sätter autentisering.
+                UserDetails user = userDetailsService.loadUserByUsername(userName);
+                var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-                if( userName != null) {
-                    UserDetails user = userDetailsService.loadUserByUsername(userName);
-                    var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities() );
-
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        }
 
-            filterChain.doFilter(request, response);
-
+        // Fortsätter requesten till nästa filter/endpoint.
+        filterChain.doFilter(request, response);
     }
 }
