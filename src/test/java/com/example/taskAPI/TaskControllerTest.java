@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TaskController.class)
 @AutoConfigureMockMvc(addFilters = false)
+// Web-layer-tester för TaskController utan att använda riktig databas.
 public class TaskControllerTest {
 
     @Autowired
@@ -39,55 +40,48 @@ public class TaskControllerTest {
     @MockitoBean
     private JwtService jwtService;
 
-
     @Test
-    void shouldReturnAllTasks() throws Exception{
-        // Arrange
+    // GET /tasks ska returnera den mockade listan från repository.
+    void shouldReturnAllTasks() throws Exception {
         Task task = new Task(1, "Köp mjölk", false);
 
         when(repository.findAll()).thenReturn(List.of(task));
 
-        // Act & Assert
         mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Köp mjölk"));
-
     }
 
     @Test
+    // POST /tasks ska spara task och returnera Created.
     void shouldAddNewTaskAndReturnCreated() throws Exception {
-        // Arrange
         String jsonRequest = "{ \"id\" : 1, \"name\" : \"Städa\", \"done\": false  }";
 
-        //Act & Assert
         mockMvc.perform(post("/tasks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Städa"));
 
-        // verifiera att databasens spara-metod faktiskt körs en gång
         verify(repository, times(1)).save(any(Task.class));
     }
 
     @Test
+    // DELETE /tasks/{id} ska radera tasken om den finns.
     void shouldDeleteTaskWhenFound() throws Exception {
-        // Arrange
         Task task = new Task();
         when(repository.findById(1)).thenReturn(task);
 
-        //Act & Assert
         mockMvc.perform(delete("/tasks/1"))
                 .andExpect(status().isNoContent());
 
         verify(repository).delete(1);
     }
 
-
     @Test
+    // DELETE /tasks/{id} ska returnera 404 om tasken saknas.
     void shouldReturnNotFoundWhenDeletingNonExistingTask() throws Exception {
-        //Arrange
         when(repository.findById(99)).thenReturn(null);
 
         mockMvc.perform(delete("/tasks/99"))
@@ -96,10 +90,9 @@ public class TaskControllerTest {
         verify(repository, never()).delete(anyInt());
     }
 
-
     @Test
+    // PATCH /tasks/{id} ska uppdatera namnet i en befintlig task.
     void shouldPatchTaskNameSuccessfully() throws Exception {
-        // Arrange
         Task existingTask = new Task();
         existingTask.setId(1);
         existingTask.setName("Gammalt namn");
@@ -108,12 +101,11 @@ public class TaskControllerTest {
 
         String patchJson = "{\"name\": \"Nytt namn\"}";
 
-        // Act & Assert
         mockMvc.perform(patch("/tasks/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(patchJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Nytt namn")); // Borde ha uppdaterats
+                .andExpect(jsonPath("$.name").value("Nytt namn"));
     }
 
 }
